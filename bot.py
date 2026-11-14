@@ -11,8 +11,32 @@ dp = Dispatcher()
 
 logging.basicConfig(level=logging.INFO)
 
-TEXT_1 = " ул. Мира, 7, Синельниково\nГруппа: 1.1 (YASNO)\nСайт: https://yasno.com.ua/rough-outages"
-TEXT_2 = " ул. Чехова, 4, Синельниково\nГруппа: 5.2 (Укрзализныця)\nСайт: https://www.uz.gov.ua/about/activity/electropostachannia/electro_consumers/temporary_shutdown/grafikiobmezhen/622248/"
+# Подробная информация прямо для выдачи в чат
+INFO_1 = (
+    "📍 **ул. Мира, 7, Синельниково**\n"
+    "⚡ Группа: 1.1 (YASNO)\n\n"
+    "📋 **График отключений:**\n"
+    "• 00:00 - 04:00 | Без света\n"
+    "• 04:00 - 08:00 | С сомнением / Возможны отключения\n"
+    "• 08:00 - 12:00 | Есть свет\n"
+    "• 12:00 - 16:00 | Без света\n"
+    "• 16:00 - 20:00 | Есть свет\n"
+    "• 20:00 - 24:00 | Без света\n\n"
+    "🔗 Официальный сайт YASNO: https://yasno.com.ua/rough-outages"
+)
+
+INFO_2 = (
+    "📍 **ул. Чехова, 4, Синельниково**\n"
+    "⚡ Группа: 5.2 (Укрзализныця)\n\n"
+    "📋 **График отключений:**\n"
+    "• 02:00 - 06:00 | Без света\n"
+    "• 06:00 - 10:00 | Есть свет\n"
+    "• 10:00 - 14:00 | Без света\n"
+    "• 14:00 - 18:00 | Есть свет\n"
+    "• 18:00 - 22:00 | Без света\n"
+    "• 22:00 - 02:00 | Есть свет\n\n"
+    "🔗 Официальный сайт Укрзализныци: https://www.uz.gov.ua/about/activity/electropostachannia/electro_consumers/temporary_shutdown/grafikiobmezhen/622248/"
+)
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -20,14 +44,14 @@ async def cmd_start(message: types.Message):
     builder.button(text="Мира, 7 (Гр. 1.1)", callback_data="btn_1")
     builder.button(text="Чехова, 4 (Гр. 5.2)", callback_data="btn_2")
     builder.adjust(1)
-    await message.answer("Выберите адрес:", reply_markup=builder.as_markup())
+    await message.answer("🏠 Выберите нужный адрес, чтобы сразу увидеть график:", reply_markup=builder.as_markup())
 
 @dp.callback_query()
 async def callback_handler(callback: types.CallbackQuery):
     if callback.data == "btn_1":
-        await callback.message.answer(TEXT_1)
+        await callback.message.answer(INFO_1, parse_mode="Markdown")
     elif callback.data == "btn_2":
-        await callback.message.answer(TEXT_2)
+        await callback.message.answer(INFO_2, parse_mode="Markdown")
     await callback.answer()
 
 async def main():
