@@ -55,11 +55,11 @@ async def callback_handler(callback: types.CallbackQuery):
         await callback.message.answer(INFO_2, parse_mode="Markdown")
     await callback.answer()
 
-# Простой веб-сервер для Render, чтобы он видел открытый порт
+# Веб-сервер для Render
 async def handle(request):
     return web.Response(text="Bot is alive!")
 
-async def web_server():
+async def start_web_server():
     app = web.Application()
     app.router.add_get("/", handle)
     runner = web.AppRunner(app)
@@ -67,10 +67,11 @@ async def web_server():
     port = int(os.environ.get("PORT", 10000))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
+    print(f"Web server started on port {port}")
 
 async def main():
-    # Запускаем и веб-сервер, и бота одновременно
-    await web_server()
+    # Запускаем веб-сервер и поллинг бота параллельно
+    await start_web_server()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
