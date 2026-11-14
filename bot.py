@@ -1,8 +1,10 @@
 import asyncio
 import logging
+import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiohttp import web
 
 TOKEN = "9194928064:AAF_gHnRxhFqf53fh5BFM_dcQLoIUpBYWnE"
 
@@ -11,7 +13,6 @@ dp = Dispatcher()
 
 logging.basicConfig(level=logging.INFO)
 
-# Подробная информация прямо для выдачи в чат
 INFO_1 = (
     "📍 **ул. Мира, 7, Синельниково**\n"
     "⚡ Группа: 1.1 (YASNO)\n\n"
@@ -54,7 +55,22 @@ async def callback_handler(callback: types.CallbackQuery):
         await callback.message.answer(INFO_2, parse_mode="Markdown")
     await callback.answer()
 
+# Простой веб-сервер для Render, чтобы он видел открытый порт
+async def handle(request):
+    return web.Response(text="Bot is alive!")
+
+async def web_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
 async def main():
+    # Запускаем и веб-сервер, и бота одновременно
+    await web_server()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
